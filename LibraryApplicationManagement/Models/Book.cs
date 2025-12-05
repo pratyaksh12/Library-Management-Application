@@ -4,11 +4,11 @@ namespace LibraryApplicationManagement.Models;
 
 public class Book
 {
-    public int Id{get; set;}
+    public Guid Id{get; set;} = Guid.NewGuid();
     public string Title{get; set;} = string.Empty;
     public string Author{get; set;} = string.Empty;
     public string Genre{get; set;} = string.Empty;
-    public int Raiting{get; set;}
+    public int Rating{get; set;}
     public string CoverUrl{get; set;} = string.Empty;
     public string CoverColor{get; set;} = string.Empty;
     public string Description{get; set;} = string.Empty;

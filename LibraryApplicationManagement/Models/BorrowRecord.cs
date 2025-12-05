@@ -5,10 +5,10 @@ namespace LibraryApplicationManagement.Models;
 
 public class BorrowRecord
 {
-    public int Id{get;set;}
+    public Guid Id{get;set;} = Guid.NewGuid();
     public Guid UserId{get; set;}
     public User? User{get; set;}
-    public int BookId{get; set;}
+    public Guid BookId{get; set;}
     public Book? Book { get; set; }
     public DateTime BorrowDate{get; set;} = DateTime.UtcNow;
     public DateTime DueDate{get; set;}

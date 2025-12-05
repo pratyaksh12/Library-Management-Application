@@ -48,7 +48,7 @@ namespace LibraryApplicationManagement.Controller
                 Role = UserRole.User
             };
 
-            var result = await _usermanager.CreateAsync(user);
+            var result = await _usermanager.CreateAsync(user, model.Password);
 
             if (!result.Succeeded)
             {
