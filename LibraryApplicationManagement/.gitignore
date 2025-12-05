@@ -31,3 +31,4 @@ TestResults/
 # Project Files
 *.log
 *.bak
+*.db

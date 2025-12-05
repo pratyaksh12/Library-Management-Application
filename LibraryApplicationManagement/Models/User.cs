@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace LibraryApplicationManagement.Models;
 
-public class User : IdentityUser
+public class User : IdentityUser<Guid>
 {
     public string FullName{get; set;} = string.Empty;
     public int UniversityId{get; set;}

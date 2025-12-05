@@ -1,8 +1,18 @@
+using LibraryApplicationManagement.Data;
+using LibraryApplicationManagement.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddIdentity<User, IdentityRole<Guid>>().AddEntityFrameworkStores<LibraryDbContext>().AddDefaultTokenProviders();
+builder.Services.AddDbContext<LibraryDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddOpenApi();
+
+
+
 
 var app = builder.Build();
 
