@@ -71,7 +71,7 @@ namespace LibraryApplicationManagement.Controller
             var user = await _usermanager.FindByEmailAsync(model.Email);
             if(user is not null && await _usermanager.CheckPasswordAsync(user, model.Password))
             {
-                return Ok(new {message = "User logged in successfully"});
+                return Ok(new {message = "User logged in successfully", userId = user.Id, email = user.Email});
             }
 
             return Unauthorized("Invalid email or password");

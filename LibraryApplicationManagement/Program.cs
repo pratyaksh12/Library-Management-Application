@@ -14,6 +14,7 @@ builder.Services.AddIdentity<User, IdentityRole<Guid>>().AddEntityFrameworkStore
 builder.Services.AddDbContext<LibraryDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddControllers();
 builder.Services.AddScoped<IBookRepository, BookRepository>();
+builder.Services.AddScoped<IBorrowRepository, BorrowRepository>();
 builder.Services.AddOpenApi();
 
 builder.Services.AddEndpointsApiExplorer();
