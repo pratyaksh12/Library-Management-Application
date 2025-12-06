@@ -82,6 +82,7 @@ namespace LibraryApplicationManagement.Controller
                 CoverUrl = createBookDto.CoverUrl,
                 Description = createBookDto.Description,
                 TotalCopies = createBookDto.TotalCopies,
+                AvailableCopies = createBookDto.TotalCopies,
                 VideoUrl = createBookDto.VideoUrl,
             };
 
