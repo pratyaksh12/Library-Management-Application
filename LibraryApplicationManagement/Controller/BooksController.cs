@@ -1,4 +1,5 @@
 using LibraryApplicationManagement.DTOs;
+using LibraryApplicationManagement.Helpers;
 using LibraryApplicationManagement.Interfaces;
 using LibraryApplicationManagement.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -19,9 +20,9 @@ namespace LibraryApplicationManagement.Controller
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<BookDto>>> GetBooks()
+        public async Task<ActionResult<IEnumerable<BookDto>>> GetBooks([FromBody]BookQueryObject query)
         {
-            var books = await _repository.GetAllAsync();
+            var books = await _repository.GetAllAsync(query);
             
             // Map to DTO
             var bookDtos = books.Select(b => new BookDto
