@@ -1,6 +1,7 @@
 using LibraryApplicationManagement.DTOs;
 using LibraryApplicationManagement.Interfaces;
 using LibraryApplicationManagement.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -69,6 +70,7 @@ namespace LibraryApplicationManagement.Controller
             return Ok(bookDto);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<ActionResult<BookDto>> CreateBook(CreateBookDto createBookDto)
         {

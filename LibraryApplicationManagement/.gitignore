@@ -32,3 +32,7 @@ TestResults/
 *.log
 *.bak
 *.db
+
+# Configuration Files (Secrets)
+appsettings.json
+appsettings.Development.json

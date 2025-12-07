@@ -1,5 +1,6 @@
 using LibraryApplicationManagement.DTOs;
 using LibraryApplicationManagement.Enums;
+using LibraryApplicationManagement.Interfaces;
 using LibraryApplicationManagement.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -14,10 +15,12 @@ namespace LibraryApplicationManagement.Controller
     {
         
         private readonly UserManager<User> _usermanager;
+        private readonly ITokenService _tokenService;
 
-        public AuthController(UserManager<User> userManager)
+        public AuthController(UserManager<User> userManager, ITokenService tokenService)
         {
             _usermanager = userManager;
+            _tokenService = tokenService;
         }
 
 
@@ -71,7 +74,9 @@ namespace LibraryApplicationManagement.Controller
             var user = await _usermanager.FindByEmailAsync(model.Email);
             if(user is not null && await _usermanager.CheckPasswordAsync(user, model.Password))
             {
-                return Ok(new {message = "User logged in successfully", userId = user.Id, email = user.Email});
+
+                var token = _tokenService.CreateToken(user);
+                return Ok(new {message = "User logged in successfully", userId = user.Id, email = user.Email, Token = token});
             }
 
             return Unauthorized("Invalid email or password");
