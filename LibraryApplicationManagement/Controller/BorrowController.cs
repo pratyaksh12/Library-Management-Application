@@ -10,7 +10,7 @@ namespace LibraryApplicationManagement.Controller
 {
     [Route("api/[controller]")]
     [ApiController]
-    
+
     public class BorrowController : ControllerBase
     {
         private readonly IBorrowRepository _borrowRepository;
@@ -30,7 +30,7 @@ namespace LibraryApplicationManagement.Controller
         {
             return Ok("Borrow Controller is working");
         }
-        
+
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> BorrowBook([FromBody] BorrowBookDto model)
@@ -40,8 +40,14 @@ namespace LibraryApplicationManagement.Controller
             if (book == null) return NotFound("Book not found");
 
             // 2. Check User
-            var user = await _userManager.FindByIdAsync(model.UserId.ToString());
-            if (user == null) return NotFound("User not found");
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.NameId);
+            if(userIdClaim is null) return Unauthorized();
+
+            var userId = Guid.Parse(userIdClaim.Value);
+            
+            // Verify user exists in DB (prevents deleted users with valid tokens from borrowing)
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null) return Unauthorized("User no longer exists");
 
             // 3. Check Availability
             if (book.AvailableCopies <= 0)
@@ -53,7 +59,7 @@ namespace LibraryApplicationManagement.Controller
             var borrowRecord = new BorrowRecord
             {
                 BookId = model.BookId,
-                UserId = model.UserId,
+                UserId = userId,
                 BorrowDate = DateTime.UtcNow,
                 DueDate = DateTime.UtcNow.AddDays(14), // Default 2 weeks
                 Status = BorrowStatus.Borrowed,
@@ -96,6 +102,33 @@ namespace LibraryApplicationManagement.Controller
             }
 
             return Ok(new { message = "Book returned successfully" });
+        }
+
+        [HttpGet("my-books")]
+        [Authorize]
+        public async Task<IActionResult> GetMyBorrowedBooks()
+        {
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.NameId);
+
+            if (userIdClaim is null) return Unauthorized();
+
+            var userId = Guid.Parse(userIdClaim.Value);
+
+            var records = await _borrowRepository.GetByUserId(userId);
+
+            var history = records.Select(r => new UserBorrowHistoryDto
+            {
+                RecordId = r.Id,
+                BookTitle = r.Book?.Title ?? "Unknown",
+                Author = r.Book?.Author ?? "Unknown",
+                BorrowDate = r.BorrowDate,
+                DueDate = r.DueDate,
+                ReturnDate = r.ReturnDate,
+                Status = r.Status
+            });
+
+            return Ok(history);
+
         }
     }
 }

@@ -42,4 +42,14 @@ public class BorrowRepository : IBorrowRepository
         _context.BorrowRecords.Update(record);
         await _context.SaveChangesAsync();
     }
+
+    public async Task<List<BorrowRecord>> GetByUserId(Guid userId)
+    {
+        return await _context.BorrowRecords
+            .Include(br => br.Book)
+            .Where(br => br.UserId == userId)
+            .OrderByDescending(br => br.BorrowDate)
+            .ToListAsync();
+    }
+
 }
