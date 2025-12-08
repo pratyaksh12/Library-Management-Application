@@ -20,7 +20,7 @@ namespace LibraryApplicationManagement.Controller
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<BookDto>>> GetBooks([FromBody]BookQueryObject query)
+        public async Task<ActionResult<IEnumerable<BookDto>>> GetBooks([FromQuery]BookQueryObject query)
         {
             var books = await _repository.GetAllAsync(query);
             

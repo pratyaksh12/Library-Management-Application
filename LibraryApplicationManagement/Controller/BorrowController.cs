@@ -5,6 +5,7 @@ using LibraryApplicationManagement.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace LibraryApplicationManagement.Controller
 {
@@ -40,8 +41,8 @@ namespace LibraryApplicationManagement.Controller
             if (book == null) return NotFound("Book not found");
 
             // 2. Check User
-            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.NameId);
-            if(userIdClaim is null) return Unauthorized();
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
+            if(userIdClaim is null) return Unauthorized("debugging-rn");
 
             var userId = Guid.Parse(userIdClaim.Value);
             
