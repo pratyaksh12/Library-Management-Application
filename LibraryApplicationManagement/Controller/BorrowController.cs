@@ -39,7 +39,7 @@ namespace LibraryApplicationManagement.Controller
 
             var userId = Guid.Parse(userIdClaim.Value);
             
-            // Verify user exists in DB (prevents deleted users with valid tokens from borrowing)
+            //make sure the user still exists
             var user = await _userManager.FindByIdAsync(userId.ToString());
             if (user == null) return Unauthorized("User no longer exists");
 
@@ -60,14 +60,18 @@ namespace LibraryApplicationManagement.Controller
                 ReturnDate = null
             };
 
+            
+
             // 5. Update Book Copies
             book.AvailableCopies--;
             await _bookRepository.UpdateAsync(book);
 
             // 6. Save Record
-            await _borrowRepository.AddAsync(borrowRecord);
+            var success = await _borrowRepository.AddAsync(borrowRecord);
 
-            return Ok(new { message = "Book borrowed successfully", recordId = borrowRecord.Id });
+            return success ? Ok(new { message = "Book borrowed successfully", recordId = borrowRecord.Id }) : BadRequest("Only one borrow is possible for the same book");
+
+            
         }
 
         [HttpPost("return/{id}")]

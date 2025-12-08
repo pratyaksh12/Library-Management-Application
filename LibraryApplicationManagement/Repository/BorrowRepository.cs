@@ -31,10 +31,18 @@ public class BorrowRepository : IBorrowRepository
             .ToListAsync();
     }
 
-    public async Task AddAsync(BorrowRecord record)
+    public async Task<bool> AddAsync(BorrowRecord record)
     {
+
+        var recordExists = await _context.BorrowRecords.FirstOrDefaultAsync(br => br.UserId == record.UserId && br.BookId == record.BookId && br.Status == Enums.BorrowStatus.Borrowed);
+        if(recordExists is not null)
+        {
+            return false;
+        }
+        
         await _context.BorrowRecords.AddAsync(record);
         await _context.SaveChangesAsync();
+        return true;
     }
 
     public async Task UpdateAsync(BorrowRecord record)
