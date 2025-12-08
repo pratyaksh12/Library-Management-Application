@@ -25,13 +25,6 @@ namespace LibraryApplicationManagement.Controller
             _userManager = userManager;
         }
 
-        [HttpGet("test")]
-        [AllowAnonymous]
-        public IActionResult Test()
-        {
-            return Ok("Borrow Controller is working");
-        }
-
         [HttpPost]
         [Authorize]
         public async Task<IActionResult> BorrowBook([FromBody] BorrowBookDto model)

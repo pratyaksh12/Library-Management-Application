@@ -9,6 +9,8 @@ using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer; // Added for JwtBearerDefaults
 using Microsoft.IdentityModel.Tokens; // Added for SymmetricSecurityKey and TokenValidationParameters
 using System.Text; // Added for Encoding
+using FluentValidation;
+using FluentValidation.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -45,6 +47,8 @@ builder.Services.AddAuthentication(options =>
 });
 builder.Services.AddDbContext<LibraryDbContext>(options => options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 builder.Services.AddControllers();
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<IBorrowRepository, BorrowRepository>();
 builder.Services.AddScoped<ITokenService, TokenService>();
@@ -84,6 +88,8 @@ builder.Services.AddSwaggerGen(option =>
 
 
 var app = builder.Build();
+
+app.UseMiddleware<LibraryApplicationManagement.Middleware.ExceptionMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
