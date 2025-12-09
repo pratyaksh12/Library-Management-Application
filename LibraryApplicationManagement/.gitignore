@@ -1,0 +1,28 @@
+# Build results
+[Bb]in/
+[Oo]bj/
+
+# Database
+*.db
+*.db-shm
+*.db-wal
+
+# User-specific files
+*.user
+*.userosscache
+*.sln.docstates
+
+# VS Code
+.vscode/
+
+# IDEs
+.idea/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+
+# Secrets
+appsettings.json
+!appsettings.Example.json
+!appsettings.Development.json
