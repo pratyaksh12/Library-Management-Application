@@ -21,7 +21,7 @@ builder.Services.AddIdentity<User, IdentityRole<Guid>>()
     .AddEntityFrameworkStores<LibraryDbContext>()
     .AddDefaultTokenProviders();
 
-// Add Authentication (JWT) - MUST BE AFTER IDENTITY
+// Add Authentication 
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = 
@@ -83,11 +83,21 @@ builder.Services.AddSwaggerGen(option =>
     });
 });
 
+//allow cors service
 
-
-
-
+builder.Services.AddCors(
+    options =>
+    {
+        options.AddPolicy("AllowReactApplication",
+            policy =>
+            {
+                policy.WithOrigins("http://localhost:3000").AllowAnyMethod().AllowAnyHeader();
+            }
+        );
+    }
+);
 var app = builder.Build();
+app.UseCors("AllowReactApplication");
 
 app.UseMiddleware<LibraryApplicationManagement.Middleware.ExceptionMiddleware>();
 

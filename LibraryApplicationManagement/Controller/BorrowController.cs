@@ -34,8 +34,9 @@ namespace LibraryApplicationManagement.Controller
             if (book == null) return NotFound("Book not found");
 
             // 2. Check User
-            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-            if (userIdClaim is null) return Unauthorized("debugging-rn");
+            var userIdClaim = User.Claims. User.Claims.FirstOrDefault(c => c.Type == System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.NameId);
+
+            if (userIdClaim is null) return Unauthorized("User is not authenticated properly. Missing NameIdentifier claim.");
 
             var userId = Guid.Parse(userIdClaim.Value);
 
@@ -108,10 +109,11 @@ namespace LibraryApplicationManagement.Controller
         [Authorize]
         public async Task<IActionResult> GetMyBorrowedBooks()
         {
-            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.NameId);
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier) 
+                           ?? User.Claims.FirstOrDefault(c => c.Type == "nameid")
+                           ?? User.Claims.FirstOrDefault(c => c.Type == System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.NameId);
 
-            if (userIdClaim is null) return Unauthorized();
-
+            if (userIdClaim is null) return Unauthorized("User is not authenticated properly. Missing NameIdentifier claim.");
             var userId = Guid.Parse(userIdClaim.Value);
 
             var records = await _borrowRepository.GetByUserId(userId);
