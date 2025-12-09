@@ -95,8 +95,8 @@ namespace LibraryManagementTest
         {
             //Arrange
 
-            var bookId = new Guid();
-            var userId = new Guid();
+            var bookId = Guid.NewGuid();
+            var userId = Guid.NewGuid();
 
 
             //mock book having 0 copies
@@ -109,6 +109,9 @@ namespace LibraryManagementTest
                 ]
             ));
 
+            _controller.ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext { User = userClaims } };
+
+            _mockUserManager.Setup(u => u.FindByIdAsync(userId.ToString())).ReturnsAsync(new User());
 
             var dto = new BorrowBookDto{BookId = bookId};
 
@@ -118,6 +121,64 @@ namespace LibraryManagementTest
 
             //Assert
             result.Should().BeOfType<BadRequestObjectResult>();
+        }
+
+
+        [Fact]
+        public async Task BorrowBook_ShouldReturnBadRequest_WhereUserAlreadyBorrowed()
+        {
+            //Arrange
+            var bookId = new Guid();
+            var userId = new Guid();
+            var borrowRecord = new BorrowRecord{UserId = userId, BookId =bookId};
+
+
+            _mockBookRepo.Setup(r => r.GetByIdAsync(bookId)).ReturnsAsync(new Book{Id = bookId, AvailableCopies = 2});
+            var userClaims = new ClaimsPrincipal(new ClaimsIdentity([
+                new Claim(ClaimTypes.NameIdentifier, userId.ToString())
+            ]));
+
+            //had to use DefaultHttpContext for it to mock a valid user
+            _controller.ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext { User = userClaims } };
+            _mockUserManager.Setup(r => r.FindByIdAsync(userId.ToString())).ReturnsAsync(new User());
+            _mockBorrowRepo.Setup(r => r.AddAsync(It.Is<BorrowRecord>(b => b.UserId == userId && b.BookId == bookId))).ReturnsAsync(false);
+            var dto = new BorrowBookDto{BookId = bookId};
+            //Act
+
+            var result = await _controller.BorrowBook(dto);
+
+            //Assert
+            result.Should().BeOfType<BadRequestObjectResult>();
+            var badRequestResult = result as BadRequestObjectResult;
+            badRequestResult!.Value.Should().Be("Only one borrow is possible for the same book");            
+
+        }
+
+        [Fact]
+        public async Task BorrowBook_ShouldReturnOk_WhenRequestIsValid()
+        {
+
+            //Arrange
+            var bookId = Guid.NewGuid();
+            var userId = Guid.NewGuid();
+            var borrowDto = new BorrowBookDto{BookId = bookId};
+            var book = new Book{Id = bookId, AvailableCopies = 5};
+
+            _mockBookRepo.Setup(b => b.GetByIdAsync(bookId)).ReturnsAsync(book);
+
+            //mock user claims and insert it into the controller to access
+            var userClaims = new ClaimsPrincipal(new ClaimsIdentity([new Claim(ClaimTypes.NameIdentifier, userId.ToString())]));
+            _controller.ControllerContext = new ControllerContext{HttpContext = new DefaultHttpContext {User = userClaims}};
+            _mockUserManager.Setup(u => u.FindByIdAsync(userId.ToString())).ReturnsAsync(new User());
+            _mockBorrowRepo.Setup(b => b.AddAsync(It.Is<BorrowRecord>(b => b.BookId == bookId))).ReturnsAsync(true);
+
+            //Act
+            var result = await _controller.BorrowBook(borrowDto);
+
+            //Assert
+            result.Should().BeOfType<OkObjectResult>();
+            _mockBookRepo.Verify(b => b.UpdateAsync(It.Is<Book>(b => b.AvailableCopies == 4)), Times.Exactly(1));
+
         }
     }
 }

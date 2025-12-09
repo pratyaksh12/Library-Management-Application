@@ -35,10 +35,10 @@ namespace LibraryApplicationManagement.Controller
 
             // 2. Check User
             var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier);
-            if(userIdClaim is null) return Unauthorized("debugging-rn");
+            if (userIdClaim is null) return Unauthorized("debugging-rn");
 
             var userId = Guid.Parse(userIdClaim.Value);
-            
+
             //make sure the user still exists
             var user = await _userManager.FindByIdAsync(userId.ToString());
             if (user == null) return Unauthorized("User no longer exists");
@@ -60,18 +60,20 @@ namespace LibraryApplicationManagement.Controller
                 ReturnDate = null
             };
 
-            
-
-            // 5. Update Book Copies
-            book.AvailableCopies--;
-            await _bookRepository.UpdateAsync(book);
-
-            // 6. Save Record
             var success = await _borrowRepository.AddAsync(borrowRecord);
 
-            return success ? Ok(new { message = "Book borrowed successfully", recordId = borrowRecord.Id }) : BadRequest("Only one borrow is possible for the same book");
+            if (success)
+            {
+                book.AvailableCopies--;
+                await _bookRepository.UpdateAsync(book);
+                return Ok(new { message = "Book borrowed successfully", recordId = borrowRecord.Id });
+            }
+            else
+            {
+                return BadRequest("Only one borrow is possible for the same book");
+            }
 
-            
+
         }
 
         [HttpPost("return/{id}")]
