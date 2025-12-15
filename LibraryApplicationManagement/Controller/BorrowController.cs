@@ -34,7 +34,7 @@ namespace LibraryApplicationManagement.Controller
             if (book == null) return NotFound("Book not found");
 
             // 2. Check User
-            var userIdClaim = User.Claims. User.Claims.FirstOrDefault(c => c.Type == System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.NameId);
+            var userIdClaim = User.Claims.FirstOrDefault(c => c.Type == System.IdentityModel.Tokens.Jwt.JwtRegisteredClaimNames.NameId);
 
             if (userIdClaim is null) return Unauthorized("User is not authenticated properly. Missing NameIdentifier claim.");
 
