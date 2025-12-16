@@ -36,3 +36,4 @@ TestResults/
 # Configuration Files (Secrets)
 appsettings.json
 appsettings.Development.json
+.DS_Store
