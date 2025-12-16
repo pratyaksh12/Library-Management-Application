@@ -1,6 +1,4 @@
-# Midnight Library 📚
-
-A modern, full-stack library management system featuring a premium "Midnight" dark theme, real-time book availability, and a seamless borrowing experience.
+# Midnight Library 
 
 ## Tech Stack 🛠️
 
@@ -21,7 +19,7 @@ A modern, full-stack library management system featuring a premium "Midnight" da
 -   **Node.js** (v18+)
 -   **.NET SDK** (v8.0+)
 
-## Getting Started 🚀
+## Getting Started 
 
 ### 1. Backend Setup
 Navigate to the backend directory and start the server:
